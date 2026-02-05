@@ -282,6 +282,8 @@ This helps identify high-performing regions that contribute most to revenue and 
 
 **Visual Used:**
 Card
+
+
 <img width="362" height="340" alt="Image" src="https://github.com/user-attachments/assets/e26ba1d6-2732-41f1-939d-bffbfc8460ec" />
 
 **Implementation:**
