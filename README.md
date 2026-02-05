@@ -437,8 +437,6 @@ These KPIs provide a **complete period-over-period performance view**, showing b
 
 
 # Insights
-Ah yes! Let’s include **the period-over-period numbers** in a human-friendly way with figures and percentages so it reads naturally:
-
 ---
 
 ## Key Insights from Dashboard
@@ -477,9 +475,3 @@ For any two selected periods
 ### [7] Orders
 
 * Total orders reached **X**, showing steady customer activity and demand trends.
-
-
-
-
-A single page report was created on Power BI Desktop & it was then published to Power BI Service.
-
