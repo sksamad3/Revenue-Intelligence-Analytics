@@ -1,0 +1,22 @@
+Canvas Setting
+Height - 720px 
+Width - 1080px
+
+
+Canvas Background color & border color of visuals
+#012A4A
+
+
+Individual Visual Setting
+1. X & Y labels - OFF
+2. Visual Background - OFF
+3. All Units - in millions
+4. Data Labels - ON
+5. Columns - Lowest values - #FB8500
+    	     Highest value - #E8BC8A
+6. Canvas Background color - #012A4A
+   Layout - 2 Rows x 3 Columns
+7. Rounded border - 15 px  , color - #012A4A
+8. Visual shadow color - #001B2E
+
+Visual Heading fonts - SegoeUI SemiBold

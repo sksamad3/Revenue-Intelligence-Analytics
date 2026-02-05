@@ -1,0 +1,677 @@
+# Sales Dashboard
+
+### Dashboard Link : https://app.powerbi.com/groups/me/reports/384d017e-e935-44dc-9e7d-1626c1a36de1/ReportSection
+
+## Problem Statement
+
+The business generates large volumes of sales data, but currently lacks a clear and interactive way to track product performance, profitability, discounts, and regional sales. Management is unable to easily identify which products are driving revenue, which are causing losses, or how sales and profit are changing over time.
+
+Because of this, it is difficult to compare different time periods, evaluate the impact of discounts, and detect sales trends across cities and customer segments. These gaps lead to inefficient pricing, weak promotional decisions, and missed growth opportunities.
+
+This dashboard solves the problem by providing real-time visibility into sales, profit, quantity sold, net sales, and discount behavior, allowing users to analyze performance across products, locations, customers, and time to support better business decisions.
+
+
+
+## Project Objective
+
+- The objective of this dashboard is to help business stakeholders:
+
+- Monitor overall sales and profit performance
+
+- Identify top and bottom performing products
+
+- Analyze the impact of discounts on revenue and profitability
+
+- Track sales trends across different time periods
+
+- Compare performance between regions, promotions, and customer segments
+
+
+
+Key Features
+- Interactive filters for Year, Quarter, and Month
+
+- Drill-down analysis by product, promotion, and location
+
+- KPIs highlighting revenue sacrificed to discounts and return on discount
+
+- Time-series trend analysis for sales performance
+
+- Comparative visuals for sales vs profit across states and promotions
+
+
+
+## Data Description
+
+The dashboard is built using a star schema data model consisting of one fact table and multiple dimension tables:
+
+### Fact Table
+- Index
+- Customer ID
+- Order Date
+- Promotion ID
+- Product ID
+- Units sold 
+- Discount value
+- Net Sales 
+- Pricer Per Unit (INR) 
+- Total Sales
+- Discount Percentage
+- Profit 
+
+
+
+Dimension Tables
+
+#### Product 
+- ProductID 
+- Product Name
+- Product Line
+- Price per Unit
+
+
+#### Customer 
+-Customer ID 
+- Customer Name
+- City
+- State
+- Pincode 
+- Email ID  
+- Phone number
+
+
+
+#### Promotion: 
+- PromotionID 
+- Promotion Name 
+- Ad Type
+- Coupon Code
+- Price Reduction type 
+- Discount Percentage
+
+
+Date: 
+- Date 
+- Month
+- Quarter
+- Year
+
+
+### Data Modeling Enhancements
+- To improve analytical capabilities and follow best practices:
+- Dedicated Date tables were created to enable time intelligence analysis such as month-over-month and year-over-year comparisons.
+- A separate Measures table was created to organize all DAX measures for better readability and maintainability.
+- Additional calculated columns were added where necessary to support business analysis.
+
+
+
+
+
+## Data Preparation
+Before building the dashboard, the data was prepared and validated to ensure accuracy and consistency.
+Loaded all datasets into the Power BI model
+Opened Power Query Editor and renamed tables and columns for clarity
+Performed column profiling, column quality checks, and value distribution checks to understand the data
+Verified and corrected data types for every column
+This step helped in understanding the structure of the data and prepared a strong foundation for data modeling.
+Key Learning:
+Always verify column data types, because incorrect data types can break relationships and lead to inaccurate report results.
+
+
+
+#### Data Modeling Steps
+
+Several important transformations were performed before building relationships:
+
+Some columns in the Fact table such as Price Per Unit, Total Sales, Discount Percentage, Discount Value, and Net Sales contained null values and needed to be derived.
+
+Steps taken:
+
+Price Per Unit
+Merged the Product table with the Fact table using Product ID to bring the price into the fact table.
+
+Total Sales
+Calculated using:
+Total Sales = Price Per Unit × Units Sold
+
+Discount Percentage
+Merged the Promotion table with the Fact table using Promotion ID to identify the discount applicable for each transaction.
+Null values were replaced with 0 to avoid calculation errors.
+
+Discount Value
+Calculated using:
+Discount Value = (Discount Percentage × Total Sales) / 100
+
+
+
+#### Relationship Preparation
+
+Before creating relationships, key columns were checked to ensure:
+
+Matching data types
+
+No missing or inconsistent values
+
+This prevents broken relationships and incorrect DAX results later.
+
+
+
+####Data Model Design
+
+Implemented a Star Schema in Model View
+
+Fact table placed at the center
+
+Dimension tables arranged around it
+
+Relationships created between dimension tables and fact table using key columns
+
+
+
+## Business Questions & Dashboard Implementation
+
+The dashboard was developed to answer key business questions using appropriate visuals, filters, and DAX calculations. Each visual was designed not only to display data but to support decision-making.
+
+---
+
+### 1️⃣ Top / Bottom 5 Products by Sales, Profit, and Quantity Sold for Accessories , clothing and footwear. 
+
+**Visual :**
+A stacked bar chart was used to display product performance. Visual-level Top N filters were applied to dynamically show the Top 5 or Bottom 5 products
+
+**Insight:**
+This analysis highlights the best-performing products driving revenue and profitability, while also revealing low-performing products that may need pricing changes, promotional support, or possible discontinuation.
+
+Highest Performing
+Raymond suit - 274 units sold 
+Raymond suit - 4.1 Million sales 
+Raymond suit - 0.14 million profit.
+
+Lowest Performing 
+Fab India Kurta - 210 units sold
+H&M Tshirt  - 0.37 million sales
+H&M Tshirt - 0.04 million profit
+
+
+
+---
+
+### 2️⃣ Sales Trends Over Time (Daily, Monthly, Quarterly, Annually)
+
+**Implementation:**
+Used Three slicers (Year, Quarter, Month)  added  
+ a line chart that dynamically updates based on the selected time period, allowing multi-level trend analysis.
+
+**Insight:**
+Sales spikes indicate high-demand periods where the business can focus on marketing and stock readiness, 
+while lower sales months highlight the need for promotions and inventory control to maintain steady performance.
+---
+
+
+
+
+### 4️⃣ Compare Sales, Profit, and Quantity Sold Between Two Selected Periods
+
+**Implementation:**
+Two separate Date tables were created using `CALENDARAUTO()` and connected to the fact table using active and inactive relationships.
+
+Two slicers were created:
+
+* First slicer controls Base Period (active relationship)
+* Second slicer controls Comparison Period (inactive relationship activated using DAX)
+
+A clustered column chart was used to compare values between the two periods.  3 visuals for Quantity , sales , Profit. 
+
+**DAX Measures Used:**
+
+```DAX
+Sum of Profit 2 =
+CALCULATE(
+    SUM('Fact Table'[Profit]),
+    ALL('Date Table 1'),
+    USERELATIONSHIP('Date Table 2'[Date], 'Fact Table'[General Date])
+)
+```
+
+```DAX
+Sum of Sales 2 =
+CALCULATE(
+    SUM('Fact Table'[Net Sales]),
+    ALL('Date Table 1'),
+    USERELATIONSHIP('Date Table 2'[Date], 'Fact Table'[General Date])
+)
+```
+
+```DAX
+Sum of Quantity 2 =
+CALCULATE(
+    SUM('Fact Table'[Units Sold]),
+    ALL('Date Table 1'),
+    USERELATIONSHIP('Date Table 2'[Date], 'Fact Table'[General Date])
+)
+```
+
+**Insight:**
+This enables direct performance comparison between two time periods, helping stakeholders measure growth, evaluate promotional effectiveness, and understand business performance changes over time.
+
+---
+
+### 5️⃣ Average Discount Offered in Each Promotion Category
+
+**Implementation:**
+A stacked column chart was used to display the average discount percentage across promotion categories.
+
+**Insight:**
+The analysis shows how aggressive each promotion type is. It helps determine whether higher discounts are actually leading to stronger performance or simply reducing profit margins.
+
+---
+
+### 6️⃣ Total Number of Orders
+
+**Implementation:**
+A KPI card was used to display the total number of orders.
+
+**Insight:**
+This provides a quick measure of business activity and helps track order volume trends when combined with time filters.
+
+---
+
+### 7️⃣ Order-Level Detailed Analysis
+
+**Implementation:**
+A detailed table visual was created to show Sales, Profit, Discount, Net Sales, and other fields at the individual order level.
+This table can be filtered using slicers for Product, Date, Customer ID, and Promotion Category.
+
+**Insight:**
+This view allows granular investigation of specific transactions, supporting operational analysis such as identifying unusually high discounts, low-profit orders, or customer-level purchasing behavior.
+
+---
+
+### 8️⃣ Sales & Profit by Different Cities
+
+**Implementation:**
+Used a Clustered column chart to compare sales and profit by each city .
+
+**Insight:**
+This helps identify high-performing regions that contribute most to revenue and underperforming locations where marketing efforts or distribution strategies may need improvement.
+
+
+
+
+
+
+
+
+### **1️⃣Average Discount on Discounted Orders**
+
+**Visual Used:**
+Card
+
+**Approach / Implementation:**
+Calculated the average discount percentage only for transactions where a discount was applied.
+
+DAX 
+Average Discount % = AVERAGEX(
+                                FILTER(
+                                        'Fact Table', 
+                                        'Fact Table'[Discount Percentage] > 0),
+                                'Fact Table'[Discount Percentage]
+                                )
+
+
+
+**Insight:**
+On orders where a discount was applied, the average discount rate is 27%, 
+This showed promotions are relatively deep when used. 
+This helps assess whether discounting strategies are driving sales effectively without excessively reducing margins.
+
+
+
+### **2️⃣ Return on Discount**
+
+**Visual Used:**
+KPI Card
+
+**Approach / Implementation:**
+Measured how much profit is generated for every unit of discount offered.
+
+
+DAX 
+Return on Discount (ROD) % = DIVIDE(
+                                    SUM('Fact Table'[Profit]),
+                                    SUM('Fact Table'[Discount Value])
+                                    )
+
+**Insight:**
+The result was 1.70 , which shows that for every 1Rupee spent on discount the business earned 70 paise as profit that sums to 1.7rs, 
+The ROD value of 1.70 shows that for every ₹1 spent on discounts, the business earned ₹1.70 in profit. This indicates that discount
+ strategies are generating profitable returns rather than simply reducing margins.
+
+
+
+### **3️⃣ Total Orders**
+
+**Visual Used:**
+Card
+
+**Approach / Implementation:**
+Counted the total number of transactions to measure overall order volume.
+
+**Insight:**
+This KPI provides a quick view of business activity and helps track demand trends over time when combined with date filters.
+
+
+
+
+
+Love this part — this is where your project starts sounding **analytical and senior-level**, not just visual-building.
+
+Here’s how to document these KPIs clearly and professionally in your README 👇
+
+---
+
+## 📊 Period Comparison KPIs
+
+### **1️⃣ Comparison Period Sales**
+
+**Visual Used:**
+Bar Chart / Card
+
+**Approach / Implementation:**
+
+Created a system that allows users to select a base period and a comparison period to evaluate performance side by side. Measures were designed to calculate Sales, Profit, and Quantity for both periods, along with the difference and growth rate between them.
+
+Implemented period comparison using two date tables — 
+one active for the base period and 
+one inactive for the comparison period. 
+
+The USERELATIONSHIP() function was used inside CALCULATE() to activate the secondary date relationship while removing the primary date filter, enabling independent time-based calculations for Sales, Profit, and Quantity.
+
+**Insight:**
+This allows the business to evaluate sales performance in a different time frame without affecting the primary reporting period, enabling flexible period-over-period analysis.
+
+
+
+---
+
+### **2️⃣ Sales Difference**
+
+**Visual Used:**
+Card
+
+**Approach / Implementation:**
+Calculated the absolute difference between **comparison period sales** and **base period sales**.
+
+**Insight:**
+This KPI shows how much sales have increased or decreased between two selected periods, helping identify performance improvement or decline in clear monetary terms.
+
+---
+
+### **3️⃣ Sales Growth (%)**
+
+**Visual Used:**
+Card
+
+**Approach / Implementation:**
+Divided the sales difference by base period sales to measure **percentage change in performance** between the two periods.
+
+**Insight:**
+This metric highlights the rate of growth or decline over time, helping stakeholders quickly assess business momentum and the effectiveness of recent strategies.
+
+---
+
+### 💡 Why This Section Is Powerful (optional closing line)
+
+Together, these KPIs provide a **complete period-over-period performance view**, showing both absolute and percentage change, which supports strategic planning and performance evaluation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Preparation 
+- I first loaded the data into powerbi model . 
+- Then went to powerquery , renamed the sheets . fixed column headers, did column profiling , column quality check and distribution of each column . 
+- then checked the data type of each column and set them to suitable types.
+This helped me understanding about the data type, and set a stage for data modeling . 
+
+Learnt  - Always check data type of each column because it affects the relationship of tables in data model and in turn affects accuracy of the report. 
+
+
+Data modeling 
+In fact table , price per unit of products , total sales  , discount percentage , discount value , Net sales were completely populated with nulls.
+
+1. Price Per unit - Joined  Product table with Fact table - ProductID(common column)  to bring values to fact table . 
+
+2. Total Sales = [Price Per Unit (INR)] * [Units Sold]
+3. Discount Percentage - Joined Promotion Table with Fact table - PromotionID(common column) to bring values to fact , like which customer will get how much discount based on the promocode they have. 
+Replaced nulls with 0 to avoid calculation errors 
+
+3. Discount Value - ([Discount Percentage] * [Total Sales] )/100
+
+
+- Before creating relationships i ensured the key column's data types matches and there are no inconsistent values in them so to avoid broken relationships that might affect dax calculations further. 
+- In data model view , I implemented star schema , the fact table in center and dimension tables at corners like a star. 
+
+- Created relationships from dimension table to fact table using key columns. 
+ 
+
+
+
+
+### Business Queries 
+- 1) Top/Bottom 5 product by Sales/Profit/Quantity Sold.
+Used Stacked bar chart to represent Product names by sales / profit / quantity. Used visual level filter to represent top / bottom products. 
+
+
+- 2) How do sales trends vary over time (daily, monthly, quarterly, annually) ?
+Used  3 slicers to select Year , quarter , Month , and line chart which responds to the slicers and displays sales 
+
+
+
+
+- 3) Show relationship between sales & profit.
+Used a scatter plot to visualize profit against sales. 
+
+
+
+- 4) Compare sales/profit/quantity sold between any two periods selected by the user.
+method 1 : Create 2 date tables using calendarauto() function. created 2 date slicers which used these 2 tables. 
+Used a clustered column chart. Where the first bar was controlled by the first slicer . and the second bar was a dax calculated . Where i used calculate function to sum the sales , and used all and userelationship function to block the first slicer and use the inactive relationship to apply second slicer to the second bar using userelationship function as this function uses the inactive relationships
+
+
+sum of profit 2 = CALCULATE(
+                            SUM('Fact Table'[Profit]),
+                            ALL('Date Table 1'),
+                            USERELATIONSHIP(
+                                'Date Table 2'[Date],
+                                'Fact Table'[General Date]
+                                )
+                            )
+
+
+sum of sales 2 = CALCULATE(
+                            SUM('Fact Table'[Net Sales]),
+                            ALL('Date Table 1'),
+                            USERELATIONSHIP(
+                                 'Date Table 2'[Date],
+                                 'Fact Table'[General Date]
+                                            )
+                            )
+
+
+
+Sum of quantity 2 = CALCULATE(
+                                SUM('Fact Table'[Units Sold]),
+                                ALL('Date Table 1'),
+                                USERELATIONSHIP(
+                                    'Date Table 2'[Date],
+                                    'Fact Table'[General Date]               
+                                )
+                            )
+
+- 5) Average discount offered in each discount category.
+used stacked column chart 
+
+
+- 6) Total number of orders.
+Used KPI card to show total orders 
+
+
+- 7) Show Sales/Profit/Discount/Net Sales/All remaining fields for each order that could be filtered using visual filters. (Product/Date/Customer ID/Promotion Categories)
+
+
+- 8) Show sales by different cities.
+Used a map visual. 
+
+
+
+
+        
+  - Step 18 : The report was then published to Power BI Service.
+ 
+ 
+
+
+
+
+
+
+
+
+
+![Publish_Message](https://user-images.githubusercontent.com/102996550/174094520-3a845196-97e6-4d44-8760-34a64abc3e77.jpg)
+
+# Snapshot of Dashboard (Power BI Service)
+
+![dashboard_snapo](https://user-images.githubusercontent.com/102996550/174096257-11f1aae5-203d-44fc-bfca-25d37faf3237.jpg)
+
+ 
+ # Report Snapshot (Power BI DESKTOP)
+
+ 
+![Dashboard_upload](https://user-images.githubusercontent.com/102996550/174074051-4f08287a-0568-4fdf-8ac9-6762e0d8fa94.jpg)
+
+# Insights
+
+A single page report was created on Power BI Desktop & it was then published to Power BI Service.
+
+Following inferences can be drawn from the dashboard;
+
+### [1] Total Number of Customers = 129880
+
+   Number of satisfied Customers (Male) = 28159 (21.68 %)
+
+   Number of satisfied Customers (Female) = 28269 (21.76 %)
+
+   Number of neutral/unsatisfied customers (Male) = 35822 (27.58 %)
+
+   Number of neutral/unsatisfied customers (Female) = 37630 (28.97 %)
+
+
+           thus, higher number of customers are neutral/unsatisfied.
+           
+### [2] Average Ratings
+
+    a) Baggage Handling - 3.63/5
+    b) Check-in Service - 3.31/5
+    c) Cleanliness - 3.29/5
+    d) Ease of online booking - 2.88/5
+    e) Food & Drink - 3.21/5
+    f) In-flight Entertainment - 3.36/5
+    g) In-flight service - 3.64/5
+    h) In-flight Wifi service - 2.81/5
+    i) Leg room service - 3.37/5
+    j) On-board service - 3.38/5
+    k) Online boarding - 3.33/5
+    l) Seat comfort - 3.44/5
+    m) Departure & arrival convenience - 3.22/5
+  
+  while calculating average rating, null values have been ignored as they were not relevant for some customers. 
+  
+  These ratings will change if different visual filters will be applied.  
+  
+  ### [3] Average Delay 
+  
+      a) Average delay in arrival(minutes) - 15.09
+      b) Average delay in departure(minutes) - 14.71
+Average delay will change if different visual filters will be applied.
+
+ ### [4] Some other insights
+ 
+ ### Class
+ 
+ 1.1) 47.87 % customers travelled by Business class.
+ 
+ 1.2) 44.89 % customers travelled by Economy class.
+ 
+ 1.3) 7.25 % customers travelled by Economy plus class.
+ 
+         thus, maximum customers travelled by Business class.
+ 
+ ### Age Group
+ 
+ 2.1)  21.69 % customers belong to '0-25' age group.
+ 
+ 2.2)  52.44 % customers belong to '25-50' age group.
+ 
+ 2.3)  25.57 % customers belong to '50-75' age group.
+ 
+ 2.4)  0.31 % customers belong to '75-100' age group.
+ 
+         thus, maximum customers belong to '25-50' age group.
+         
+### Customer Type
+
+3.1) 18.31 % customers have customer type 'First time'.
+
+3.2) 81.69 % customers have customer type 'returning'.
+       
+       thus, more customers have customer type 'returning'.
+
+### Type of travel
+
+4.1) 69.06 % customers have travel type 'Business'.
+
+4.2) 30.94 % customers have travel type 'Personal'.
+
+        thus, more customers have travel type 'Business'.
+
+
+
+https://readme.so/editor
+
